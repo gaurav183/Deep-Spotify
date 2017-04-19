@@ -73,6 +73,7 @@ if (token):
 
         artist_ids = []
         for track in tracks:
+            # some error here->track is none? some id not valid->just filter nones?
             artist_ids.append(track['artists'][0]['uri'])
 
         artists = sp.artists(artist_ids)['artists']
