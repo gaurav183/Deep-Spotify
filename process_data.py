@@ -1,4 +1,4 @@
-import spotipy 
+import spotipy
 
 import sys
 import json
@@ -52,7 +52,7 @@ def get_track_ids():
 
     return track_ids
 
-username = '1259307384'
+username = '12180915492'
 token = util.prompt_for_user_token(username)
 if (token):
     sp = spotipy.Spotify(token)
@@ -60,10 +60,13 @@ if (token):
     # get ids (list of song ids)
     
     track_ids = get_track_ids()
-    # print len(track_ids)
 
-    analysis = []
-    genres = []
+    print len(track_ids)
+
+    # analysis = []
+    # genres = []
+
+    validIds = []
 
     for i in xrange(0, len(track_ids), 50):
         num = min(50,len(track_ids)-i)
@@ -71,42 +74,58 @@ if (token):
 
         tracks = sp.tracks(id_section)['tracks']
 
-        artist_ids = []
-        for track in tracks:
-            # some error here->track is none? some id not valid->just filter nones?
-            artist_ids.append(track['artists'][0]['uri'])
+        numNones = tracks.count(None)
+        for num in xrange(numNones):
+            index = tracks.index(None)
+            print id_section[index]
+            del id_section[index]
+            # del tracks[index]
 
-        artists = sp.artists(artist_ids)['artists']
+        validIds.extend(id_section)
 
-        count = 0
-        for artist in artists:
-            artist_genre = artist['genres']
-            if (len(artist_genre)==0):
-                #assert(len(sp.artist((sp.track(id_section[count]))['artists'][0]['uri'])['genres'])==0)
-                del id_section[count]
-                count -= 1
-            else:
-                genres.append(artist_genre)
+        # artist_ids = []
+        # for track in tracks:
+        #     # some error here->track is none? some id not valid->just filter nones?
+        #     artist_ids.append(track['artists'][0]['uri'])
+                
 
-            count += 1
+        # artists = sp.artists(artist_ids)['artists']
 
-        analysis.extend(sp.audio_features(tracks=id_section))
+        # count = 0
+        # for artist in artists:
+        #     artist_genre = artist['genres']
+        #     if (len(artist_genre)==0):
+        #         #assert(len(sp.artist((sp.track(id_section[count]))['artists'][0]['uri'])['genres'])==0)
+        #         del id_section[count]
+        #         count -= 1
+        #     else:
+        #         genres.append(artist_genre)
+
+        #     count += 1
+
+        # analysis.extend(sp.audio_features(tracks=id_section))
+
+    with open('song_ids.txt') as thefile:
+        print "writing"
+        for id in validIds:
+            thefile.write("%s\n" % id)
 
     # print len(genres)
     # print len(analysis)
 
 
-    input_features = np.empty([len(analysis), 9])
-    row = 0
+    # input_features = np.empty([len(analysis), 9])
+    # row = 0
 
-    for analyzed in analysis:
-        feature_list = [analyzed['energy'], analyzed['liveness'], analyzed['tempo'], 
-                        analyzed['speechiness'], analyzed['acousticness'], 
-                        analyzed['instrumentalness'], analyzed['danceability'],
-                        analyzed['loudness'], analyzed['valence']]
+    # for analyzed in analysis:
+    #     feature_list = [analyzed['energy'], analyzed['liveness'], analyzed['tempo'], 
+    #                     analyzed['speechiness'], analyzed['acousticness'], 
+    #                     analyzed['instrumentalness'], analyzed['danceability'],
+    #                     analyzed['loudness'], analyzed['valence']]
 
-        input_features[row] = feature_list
-        row += 1
+    #     input_features[row] = feature_list
+    #     row += 1
+
 
     # call NN with input_features
     # learning_rate = 0.5
