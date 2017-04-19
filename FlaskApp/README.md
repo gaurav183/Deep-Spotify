@@ -1,4 +1,3 @@
-remember to install flask
 
 pip install flask
 
