@@ -32,6 +32,7 @@ class NeuralNet:
 
     self.w2 = (np.random.rand(self.num_hidden, self.num_outputs) - 0.5)/10.0
 
+    self.genre_dict = {'genre': 0}
 
 
   def apply_sigmoid(self, x):
