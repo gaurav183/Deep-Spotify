@@ -1,0 +1,10 @@
+pop
+house
+edm
+rap 
+metal
+indie
+classical
+jazz
+r&b
+dance
