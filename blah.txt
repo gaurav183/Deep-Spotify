@@ -1,10 +1,12 @@
-pop
-house
-edm
-rap 
-metal
-indie
-classical
-jazz
-r&b
-dance
+pop - {teen}
+house - {tropical, rave}
+edm - {electro, electronic, rave}
+rap - {trap, hip, hop, grime}
+metal - {grunge, emo}
+indie - {folk, alternative}
+classical - {romantic}
+jazz - {blues, soul}
+r&b - 
+dance - {punk, teen}
+rock - 
+country - {southern}

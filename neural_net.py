@@ -32,7 +32,6 @@ class NeuralNet:
 
     self.w2 = (np.random.rand(self.num_hidden, self.num_outputs) - 0.5)/10.0
 
-    self.genre_dict = {'genre': 0}
 
 
   def apply_sigmoid(self, x):
@@ -116,7 +115,7 @@ class NeuralNet:
     for i in xrange(iterations):
         for j in xrange((X.shape)[0]):
             self.forward_propagate(X[j])
-            label = np.zeros(shape=(10,), dtype=np.float32)
+            label = np.zeros(shape=(12,), dtype=np.float32)
             label[Y[j]] = float(1)
             self.back_propagate(label)
 
