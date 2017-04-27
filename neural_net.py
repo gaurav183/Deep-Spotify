@@ -115,9 +115,9 @@ class NeuralNet:
     for i in xrange(iterations):
         for j in xrange((X.shape)[0]):
             self.forward_propagate(X[j])
-            label = np.zeros(shape=(12,), dtype=np.float32)
-            label[Y[j]] = float(1)
-            self.back_propagate(label)
+            #label = np.zeros(shape=(12,), dtype=np.float32)
+            #label[Y[j]] = float(1)
+            self.back_propagate(Y[j])
 
   def test(self, X, Y):
     """
@@ -134,9 +134,17 @@ class NeuralNet:
     wrong = float(0)
     for i in xrange((X.shape)[0]):
         self.forward_propagate(X[i])
-        prob = np.argmax(self.predicted[0])
-        if prob != (Y[i]):
-            wrong+=1
+        #prob = np.argmax(self.predicted[0])
+        num_ones = (Y[i]==1).sum()
+        temp = (self.predicted[0]).argsort()[-num_ones:][::-1]
+        indices = [i for i, x in enumerate(Y[i]) if x==1]
+        #print "pred", temp
+        #print "act", indices
+        for i in xrange(num_ones):
+            if temp[i] not in indices:
+                wrong+=1
+                break
+
             
     return float(wrong)/float((Y.shape)[0])
    

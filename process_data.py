@@ -56,9 +56,9 @@ if (token):
     genres = []
 
     # validIds = []
-    featured_artist_ids = get_spotify_artist_ids(5, 5)
+    featured_artist_ids = get_spotify_artist_ids(10, 5)
     
-    numCats = 200
+    numCats = 50
     for i in xrange(0, numCats, 50):
         num = min(50,numCats-i)
         id_section = featured_artist_ids[i:i+num]
@@ -93,7 +93,7 @@ if (token):
     # get ids (list of song ids)
     track_ids = read_track_ids();
 
-    numPos = 200
+    numPos = 1000
     for i in xrange(0, numPos, 50):
         num = min(50,numPos-i)
         id_section = track_ids[i:i+num]
@@ -166,6 +166,7 @@ if (token):
     assert(len(genres) == len(analysis))
     
     numNones = analysis.count(None)
+    print len(analysis)
     print numNones
     for num in xrange(numNones):
         index = analysis.index(None)
@@ -234,17 +235,17 @@ if (token):
     print "labels = ", labels
 
     # call NN with input_features
-    # learning_rate = 0.5
-    # structure = {'num_inputs': 9, 'num_hidden': 5, 'num_outputs': 12}
-    # candidate = NeuralNet(structure, learning_rate)
+    learning_rate = 0.5
+    structure = {'num_inputs': 9, 'num_hidden': 10, 'num_outputs': 12}
+    candidate = NeuralNet(structure, learning_rate)
 
-    # #iterations = 15000
-    # iterations = 20
+    #iterations = 15000
+    iterations = 50
 
-    # candidate.train(input_features, labels, iterations)
+    candidate.train(input_features, labels, iterations)
 
-    # cand_error = candidate.test(input_features, labels)
-    # print "Train fraction: ", cand_error
+    cand_error = candidate.test(input_features, labels)
+    print "Train fraction: ", cand_error
           
 else:
     print("Can't get token for", username)
