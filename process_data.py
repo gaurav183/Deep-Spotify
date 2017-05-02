@@ -24,12 +24,15 @@ def normalize(x, mini, maxi):
 OAUTH_TOKEN = 'BQCMjTEnwkwv5gtWm_0DFLi6HgmVGYWPt-rdWvgCxtWGvmv9zzQXgO4LOdfqQ-moWkWiiOIvnXhfloVKrKrybDp5myCqbRC5ljmjGTSXaPm2JR8yA8TD27_MljhubF5FEaKCacd2FXY'
 def get_spotify_artist_ids(numCats, numPlays):
     artist_ids = []
+    track_ids = []
     categories = sp.categories()["categories"]
     items = categories["items"]
-    for item in items[:numCats]:
+    actualNumCats = max(numCats, len(items))
+    for item in items[:actualNumCats]:
         cat_id = item["id"]
         playlists = sp.category_playlists(cat_id)["playlists"]
-        for playlist in playlists["items"][:numPlays]:
+        actualNumPlays = max(numPlays, len(playlists["items"]))
+        for playlist in playlists["items"][:actualNumPlays]:
             user = playlist["owner"]["id"]
             playlist_id = (playlist["uri"].split(":"))[-1]
             user_playlist = sp.user_playlist_tracks(user, playlist_id)
@@ -38,11 +41,11 @@ def get_spotify_artist_ids(numCats, numPlays):
                 try:
                     artists = track["track"]["artists"]
                     artist_ids.append((artists[0]["uri"].split(":"))[-1])
+                    track_ids.append(track['track']['id'])
                 except:
                     pass
-    return artist_ids
 
-
+    return track_ids
 
 
 def read_track_ids():
@@ -51,11 +54,11 @@ def read_track_ids():
 
     return track_ids
 
-def read_artist_ids():
-    with open('artist_ids.txt') as idsFile:
-        artist_ids = [x.strip('\n') for x in idsFile.readlines()]
+def read_spotify_ids():
+    with open('spotify_ids.txt') as idsFile:
+        songs = [x.strip('\n') for x in idsFile.readlines()]
 
-    return artist_ids
+    return songs
 
 
 username = '12180915492'
@@ -68,45 +71,15 @@ if (token):
     genres = []
 
     # validIds = []
-    featured_artist_ids = read_artist_ids();
-    #featured_artist_ids = get_spotify_artist_ids(20, 10)
-    
-    numCats = 23000
-    for i in xrange(0, numCats, 50):
-        num = min(50,numCats-i)
-        id_section = featured_artist_ids[i:i+num]
-
-        try:
-            artists = sp.artists(id_section)['artists']
-        except:
-            token = util.prompt_for_user_token(username)
-            sp = spotipy.Spotify(token)
-            artists = sp.artists(id_section)['artists']
-
-        count = 0
-        for artist in artists:
-            artist_genre = artist['genres']
-            if (len(artist_genre)==0):
-                #assert(len(sp.artist((sp.track(id_section[count]))['artists'][0]['uri'])['genres'])==0)
-                del id_section[count]
-                count -= 1
-            else:
-                for genre in artist_genre:
-                    if genre in genre_dict:
-                        genre_dict[genre] +=1
-                    else:
-                        genre_dict[genre] = 1
-                genres.append(artist_genre)
-
-            count += 1
-
-        analysis.extend(sp.audio_features(tracks=id_section))
-
+    spotifySongs = read_spotify_ids();
+    # spotifySongs = get_spotify_artist_ids(20, 10)    
 
     # get ids (list of song ids)
-    track_ids = read_track_ids();
+    millionSongs = read_track_ids();
 
-    numPos = 0
+    track_ids = spotifySongs[:20000] + millionSongs[:0]
+
+    numPos = len(track_ids)
     for i in xrange(0, numPos, 50):
         num = min(50,numPos-i)
         id_section = track_ids[i:i+num]
@@ -142,11 +115,11 @@ if (token):
                 del id_section[count]
                 count -= 1
             else:
-                for genre in artist_genre:
-                    if genre in genre_dict:
-                        genre_dict[genre] +=1
-                    else:
-                        genre_dict[genre] = 1
+                # for genre in artist_genre:
+                #     if genre in genre_dict:
+                #         genre_dict[genre] +=1
+                #     else:
+                #         genre_dict[genre] = 1
                 genres.append(artist_genre)
 
             count += 1
@@ -175,6 +148,8 @@ if (token):
     rock - 
     country - {southern}
     """
+    print len(genres)
+    print len(analysis)
 
     assert(len(genres) == len(analysis))
     
