@@ -10,7 +10,12 @@ import operator
 
 from neural_net import NeuralNet
 
+
 def normalize(x, mini, maxi):
+    if x==None:
+        print "x is None"
+    if mini==None:
+        print "min is None"
     return (x-mini)/(maxi-mini)
 # export SPOTIPY_CLIENT_ID='3da3c80782214b98bda0a858bccaec0e'
 # export SPOTIPY_CLIENT_SECRET='250f2c4858da43029bf11162907f5f5e'
@@ -94,7 +99,7 @@ if (token):
     # get ids (list of song ids)
     track_ids = read_track_ids();
 
-    numPos = 1000
+    numPos = 8000
     for i in xrange(0, numPos, 50):
         num = min(50,numPos-i)
         id_section = track_ids[i:i+num]
@@ -232,9 +237,10 @@ if (token):
     max_values = {}
     for analyzed in analysis: 
         for key in keys:
-            if key not in values:
-                values[key] = []
-            values[key].append(analyzed[key])
+            if analyzed[key]!=None:
+                if key not in values:
+                    values[key] = []
+                values[key].append(analyzed[key])
     for key in values:
         min_values[key] = min(values[key])
         max_values[key] = max(values[key])
@@ -244,15 +250,17 @@ if (token):
     for analyzed in analysis:
         feature_list = []
         for key in keys:
+            if analyzed[key]==None:
+                break
             v = normalize(analyzed[key], min_values[key], max_values[key])
             feature_list.append(v)
         # feature_list = [normalize(analyzed['energy'], analyzed['liveness'], analyzed['tempo'], 
         #                 analyzed['speechiness'], analyzed['acousticness'], 
         #                 analyzed['instrumentalness'], analyzed['danceability'],
         #                 abs(analyzed['loudness']), analyzed['valence']]
-
-        input_features[rowI] = feature_list
-        rowI += 1
+        if len(feature_list)==9:
+            input_features[rowI] = feature_list
+            rowI += 1
 
     print "input = ", input_features
     #print "labels = ", labels
