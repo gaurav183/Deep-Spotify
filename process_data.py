@@ -10,7 +10,8 @@ import operator
 
 from neural_net import NeuralNet
 
-
+def normalize(x, mini, maxi):
+    return (x-mini)/(maxi-mini)
 # export SPOTIPY_CLIENT_ID='3da3c80782214b98bda0a858bccaec0e'
 # export SPOTIPY_CLIENT_SECRET='250f2c4858da43029bf11162907f5f5e'
 # export SPOTIPY_REDIRECT_URI='https://www.google.com'
@@ -56,9 +57,9 @@ if (token):
     genres = []
 
     # validIds = []
-    featured_artist_ids = get_spotify_artist_ids(10, 5)
+    featured_artist_ids = get_spotify_artist_ids(20, 10)
     
-    numCats = 50
+    numCats = 500
     for i in xrange(0, numCats, 50):
         num = min(50,numCats-i)
         id_section = featured_artist_ids[i:i+num]
@@ -176,8 +177,10 @@ if (token):
     labels = np.zeros([len(genres), 12])
     rowL = 0
     
-    for genre_list in genres:
+    #for genre_list in genres:
+    while rowL<len(genres):
         dummyLabel = [0,0,0,0,0,0,0,0,0,0,0,0]
+        genre_list = genres[rowL]
         for gen in genre_list:
             if (("pop" in gen)):
                 dummyLabel[0] = 1
@@ -213,6 +216,7 @@ if (token):
         if (1 not in dummyLabel):
             del analysis[rowL]
             labels = np.delete(labels, rowL, 0)
+            del genres[rowL]
         else: 
             labels[rowL] = dummyLabel
             rowL += 1
@@ -222,21 +226,42 @@ if (token):
     input_features = np.zeros([len(analysis), 9])
     rowI = 0
 
+    keys = ['energy', 'liveness', 'tempo', 'speechiness', 'acousticness', 'instrumentalness', 'danceability', 'loudness', 'valence']
+    values = {}
+    min_values = {}
+    max_values = {}
+    for analyzed in analysis: 
+        for key in keys:
+            if key not in values:
+                values[key] = []
+            values[key].append(analyzed[key])
+    for key in values:
+        min_values[key] = min(values[key])
+        max_values[key] = max(values[key])
+
+
+
     for analyzed in analysis:
-        feature_list = [analyzed['energy'], analyzed['liveness'], analyzed['tempo'], 
-                        analyzed['speechiness'], analyzed['acousticness'], 
-                        analyzed['instrumentalness'], analyzed['danceability'],
-                        analyzed['loudness'], analyzed['valence']]
+        feature_list = []
+        for key in keys:
+            v = normalize(analyzed[key], min_values[key], max_values[key])
+            feature_list.append(v)
+        # feature_list = [normalize(analyzed['energy'], analyzed['liveness'], analyzed['tempo'], 
+        #                 analyzed['speechiness'], analyzed['acousticness'], 
+        #                 analyzed['instrumentalness'], analyzed['danceability'],
+        #                 abs(analyzed['loudness']), analyzed['valence']]
 
         input_features[rowI] = feature_list
         rowI += 1
 
     print "input = ", input_features
-    print "labels = ", labels
+    #print "labels = ", labels
+    #print "genres =", genres
+    print len(genres)
 
     # call NN with input_features
-    learning_rate = 0.5
-    structure = {'num_inputs': 9, 'num_hidden': 10, 'num_outputs': 12}
+    learning_rate = 0.2
+    structure = {'num_inputs': 9, 'num_hidden': 30, 'num_outputs': 12}
     candidate = NeuralNet(structure, learning_rate)
 
     #iterations = 15000
