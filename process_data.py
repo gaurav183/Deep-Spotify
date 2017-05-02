@@ -51,6 +51,12 @@ def read_track_ids():
 
     return track_ids
 
+def read_artist_ids():
+    with open('artist_ids.txt') as idsFile:
+        artist_ids = [x.strip('\n') for x in idsFile.readlines()]
+
+    return artist_ids
+
 
 username = '12180915492'
 genre_dict = {}
@@ -62,9 +68,10 @@ if (token):
     genres = []
 
     # validIds = []
-    featured_artist_ids = get_spotify_artist_ids(20, 10)
+    featured_artist_ids = read_artist_ids();
+    #featured_artist_ids = get_spotify_artist_ids(20, 10)
     
-    numCats = 500
+    numCats = 23000
     for i in xrange(0, numCats, 50):
         num = min(50,numCats-i)
         id_section = featured_artist_ids[i:i+num]
@@ -99,17 +106,17 @@ if (token):
     # get ids (list of song ids)
     track_ids = read_track_ids();
 
-    numPos = 8000
+    numPos = 0
     for i in xrange(0, numPos, 50):
         num = min(50,numPos-i)
         id_section = track_ids[i:i+num]
 
-        try:
-            tracks = sp.tracks(id_section)['tracks']
-        except:
-            token = util.prompt_for_user_token(username)
-            sp = spotipy.Spotify(token)
-            tracks = sp.tracks(id_section)['tracks']
+        # try:
+        #     tracks = sp.tracks(id_section)['tracks']
+        # except:
+        token = util.prompt_for_user_token(username)
+        sp = spotipy.Spotify(token)
+        tracks = sp.tracks(id_section)['tracks']
 
 
         # numNones = tracks.count(None)
@@ -184,7 +191,7 @@ if (token):
     
     #for genre_list in genres:
     while rowL<len(genres):
-        dummyLabel = [0,0,0,0,0,0,0,0,0,0,0,0]
+        dummyLabel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         genre_list = genres[rowL]
         for gen in genre_list:
             if (("pop" in gen)):
@@ -229,7 +236,7 @@ if (token):
     print "all good, both are ", len(analysis)
 
     input_features = np.zeros([len(analysis), 9])
-    rowI = 0
+    
 
     keys = ['energy', 'liveness', 'tempo', 'speechiness', 'acousticness', 'instrumentalness', 'danceability', 'loudness', 'valence']
     values = {}
@@ -246,12 +253,16 @@ if (token):
         max_values[key] = max(values[key])
 
 
-
+    rowI = 0
+    print len(analysis)
     for analyzed in analysis:
         feature_list = []
         for key in keys:
             if analyzed[key]==None:
-                break
+                # double check this
+                del genres[rowI]
+                labels = np.delete(labels, rowI, 0)
+                break                
             v = normalize(analyzed[key], min_values[key], max_values[key])
             feature_list.append(v)
         # feature_list = [normalize(analyzed['energy'], analyzed['liveness'], analyzed['tempo'], 
@@ -261,19 +272,24 @@ if (token):
         if len(feature_list)==9:
             input_features[rowI] = feature_list
             rowI += 1
+    print rowI
+    while rowI<(input_features.shape)[0]:
+        input_features = np.delete(input_features, rowI, 0)
 
     print "input = ", input_features
     #print "labels = ", labels
     #print "genres =", genres
+    print len(labels)
+    print len(input_features)
     print len(genres)
 
     # call NN with input_features
-    learning_rate = 0.2
+    learning_rate = 0.3
     structure = {'num_inputs': 9, 'num_hidden': 30, 'num_outputs': 12}
     candidate = NeuralNet(structure, learning_rate)
 
     #iterations = 15000
-    iterations = 50
+    iterations = 100
 
     candidate.train(input_features, labels, iterations)
 
