@@ -162,10 +162,10 @@ class NeuralNet:
         #print "indices", indices
         #print "predicted", self.predicted
         if temp[0] not in indices:
-            wrong+=1
+            wrong += 1
             if num_ones>1:
-                if temp[1] in indices and self.predicted[0][temp[1]]>0.4:
-                    wrong -=1
+                if ((temp[1] in indices) and self.predicted[0][temp[1]]>0.4):
+                    wrong -= 1
         # correct = False
         # for i in xrange(num_ones):
         #     if temp[i] in indices:
