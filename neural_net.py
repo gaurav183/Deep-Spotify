@@ -144,6 +144,8 @@ class NeuralNet:
         #print "predicted", self.predicted
         for i in xrange(num_ones):
             if temp[i] not in indices:
+                #print self.predicted
+                #print "indices", indices
                 wrong+=1
                 break
         # correct = False

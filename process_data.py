@@ -7,6 +7,7 @@ import spotipy.util as util
 import csv
 import numpy as np
 import operator
+import random
 
 from neural_net import NeuralNet
 
@@ -60,7 +61,8 @@ def read_spotify_ids():
 
     return songs
 
-
+random.seed(0)
+np.random.seed(0)
 username = '12180915492'
 genre_dict = {}
 token = util.prompt_for_user_token(username)
@@ -77,9 +79,9 @@ if (token):
     # get ids (list of song ids)
     millionSongs = read_track_ids();
 
-    track_ids = spotifySongs[:20000] + millionSongs[:0]
+    track_ids = spotifySongs[:10000] + millionSongs[:0]
 
-    numPos = len(track_ids)
+    numPos = 10000
     for i in xrange(0, numPos, 50):
         num = min(50,numPos-i)
         id_section = track_ids[i:i+num]
@@ -111,7 +113,6 @@ if (token):
         for artist in artists:
             artist_genre = artist['genres']
             if (len(artist_genre)==0):
-                #assert(len(sp.artist((sp.track(id_section[count]))['artists'][0]['uri'])['genres'])==0)
                 del id_section[count]
                 count -= 1
             else:
@@ -121,18 +122,13 @@ if (token):
                 #     else:
                 #         genre_dict[genre] = 1
                 genres.append(artist_genre)
-
             count += 1
+        if (len(id_section)!=0):
+            analysis.extend(sp.audio_features(tracks=id_section))
 
-        analysis.extend(sp.audio_features(tracks=id_section))
 
-    # with open('song_ids.txt') as thefile:
-    #     print "writing"
-    #     for id in validIds:
-    #         thefile.write("%s\n" % id)
-
-    # sorted_x = sorted(genre_dict.items(), key=operator.itemgetter(1))
-    # print sorted_x
+    #sorted_x = sorted(genre_dict.items(), key=operator.itemgetter(1))
+    #print sorted_x
 
     """
     pop - {teen}
@@ -161,44 +157,43 @@ if (token):
         del genres[index]
         del analysis[index]
 
-    labels = np.zeros([len(genres), 12])
+    labels = np.zeros([len(genres), 10])
     rowL = 0
-    
     #for genre_list in genres:
     while rowL<len(genres):
-        dummyLabel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        dummyLabel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         genre_list = genres[rowL]
         for gen in genre_list:
             if (("pop" in gen)):
                 dummyLabel[0] = 1
             if (("teen" in gen)):
                 dummyLabel[0] = 1
-                dummyLabel[9] = 1
-            if (("house" in gen) or ("tropical" in gen)):
-                dummyLabel[1] = 1
-            if (("rave" in gen)):
-                dummyLabel[1] = 1
-                dummyLabel[2] = 1
-            if (("edm" in gen) or ("electro" in gen)):
-                dummyLabel[2] = 1
-            if (("rap" in gen) or ("trap" in gen) or ("hip" in gen) or ("hop" in gen) or ("grime" in gen)):
-                dummyLabel[3] = 1
-            if (("metal" in gen) or ("grunge" in gen) or ("emo" in gen)):
-                dummyLabel[4] = 1
-            if (("indie" in gen) or ("folk" in gen) or ("alternative" in gen)):
-                dummyLabel[5] = 1
-            if (("classical" in gen) or ("romantic" in gen)):
-                dummyLabel[6] = 1
-            if (("jazz" in gen) or ("blues" in gen) or ("soul" in gen)):
                 dummyLabel[7] = 1
+            # if (("house" in gen) or ("tropical" in gen)):
+            #     dummyLabel[1] = 1
+            # if (("rave" in gen)):
+            # #     dummyLabel[1] = 1
+            #      dummyLabel[2] = 1
+            # if (("edm" in gen) or ("electro" in gen)):
+            #     dummyLabel[2] = 1
+            if (("rap" in gen) or ("trap" in gen) or ("hip hop" in gen)):
+                dummyLabel[1] = 1
+            if (("metal" in gen) or ("grunge" in gen) or ("emo" in gen)):
+                dummyLabel[2] = 1
+            if (("indie" in gen) or ("folk" in gen) or ("alternative" in gen)):
+                dummyLabel[3] = 1
+            if (("classical" in gen) or ("romantic" in gen)):
+                dummyLabel[4] = 1
+            if (("jazz" in gen) or ("blues" in gen) or ("soul" in gen)):
+                dummyLabel[5] = 1
             if (("r&b" in gen)):
-                dummyLabel[8] = 1
+                dummyLabel[6] = 1
             if (("dance" in gen) or ("punk" in gen)):
-                dummyLabel[9] = 1
+                dummyLabel[7] = 1
             if ("rock" in gen):
-                dummyLabel[10] = 1
+                dummyLabel[8] = 1
             if (("country" in gen) or ("southern" in gen)):
-                dummyLabel[11] = 1
+                dummyLabel[9] = 1
         
         if (1 not in dummyLabel):
             del analysis[rowL]
@@ -210,10 +205,10 @@ if (token):
     
     print "all good, both are ", len(analysis)
 
-    input_features = np.zeros([len(analysis), 9])
+    input_features = np.zeros([len(analysis), 10])
     
 
-    keys = ['energy', 'liveness', 'tempo', 'speechiness', 'acousticness', 'instrumentalness', 'danceability', 'loudness', 'valence']
+    keys = ['energy', 'liveness', 'tempo', 'speechiness', 'acousticness', 'instrumentalness', 'danceability', 'loudness', 'valence', 'mode']
     values = {}
     min_values = {}
     max_values = {}
@@ -244,7 +239,7 @@ if (token):
         #                 analyzed['speechiness'], analyzed['acousticness'], 
         #                 analyzed['instrumentalness'], analyzed['danceability'],
         #                 abs(analyzed['loudness']), analyzed['valence']]
-        if len(feature_list)==9:
+        if len(feature_list)==10:
             input_features[rowI] = feature_list
             rowI += 1
     print rowI
@@ -260,7 +255,7 @@ if (token):
 
     # call NN with input_features
     learning_rate = 0.3
-    structure = {'num_inputs': 9, 'num_hidden': 30, 'num_outputs': 12}
+    structure = {'num_inputs': 10, 'num_hidden': 30, 'num_outputs': 10}
     candidate = NeuralNet(structure, learning_rate)
 
     #iterations = 15000
