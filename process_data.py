@@ -61,8 +61,10 @@ def read_spotify_ids():
 
     return songs
 
+
 random.seed(0)
 np.random.seed(0)
+
 username = '12180915492'
 genre_dict = {}
 token = util.prompt_for_user_token(username)
@@ -81,7 +83,7 @@ if (token):
 
     track_ids = spotifySongs[:10000] + millionSongs[:0]
 
-    numPos = 10000
+    numPos = len(track_ids)
     for i in xrange(0, numPos, 50):
         num = min(50,numPos-i)
         id_section = track_ids[i:i+num]
@@ -148,52 +150,68 @@ if (token):
     print len(analysis)
 
     assert(len(genres) == len(analysis))
+
+    print "all good before nones"
     
     numNones = analysis.count(None)
-    print len(analysis)
-    print numNones
+    print "nones ", numNones
     for num in xrange(numNones):
         index = analysis.index(None)
         del genres[index]
         del analysis[index]
 
-    labels = np.zeros([len(genres), 10])
+    labels = np.zeros([len(genres), 8])
     rowL = 0
     #for genre_list in genres:
     while rowL<len(genres):
-        dummyLabel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # dummyLabel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        dummyLabel = [0, 0, 0, 0, 0, 0, 0, 0]
         genre_list = genres[rowL]
         for gen in genre_list:
             if (("pop" in gen)):
                 dummyLabel[0] = 1
             if (("teen" in gen)):
                 dummyLabel[0] = 1
-                dummyLabel[7] = 1
+                # dummyLabel[7] = 1
             # if (("house" in gen) or ("tropical" in gen)):
             #     dummyLabel[1] = 1
+            if (("house" in gen) or ("tropical" in gen) or ("edm" in gen)):
+                dummyLabel[0] = 1
             # if (("rave" in gen)):
             # #     dummyLabel[1] = 1
             #      dummyLabel[2] = 1
             # if (("edm" in gen) or ("electro" in gen)):
             #     dummyLabel[2] = 1
             if (("rap" in gen) or ("trap" in gen) or ("hip hop" in gen)):
-                dummyLabel[1] = 1
+                # dummyLabel[1] = 1
+                dummyLabel[0] = 1
             if (("metal" in gen) or ("grunge" in gen) or ("emo" in gen)):
-                dummyLabel[2] = 1
+                # dummyLabel[2] = 1
+                dummyLabel[1] = 1
             if (("indie" in gen) or ("folk" in gen) or ("alternative" in gen)):
-                dummyLabel[3] = 1
+                # dummyLabel[3] = 1
+                dummyLabel[2] = 1
             if (("classical" in gen) or ("romantic" in gen)):
-                dummyLabel[4] = 1
+                # dummyLabel[4] = 1
+                dummyLabel[3] = 1
             if (("jazz" in gen) or ("blues" in gen) or ("soul" in gen)):
-                dummyLabel[5] = 1
+                # dummyLabel[5] = 1
+                dummyLabel[4] = 1
             if (("r&b" in gen)):
-                dummyLabel[6] = 1
+                # dummyLabel[6] = 1
+                dummyLabel[5] = 1
             if (("dance" in gen) or ("punk" in gen)):
-                dummyLabel[7] = 1
+                # dummyLabel[7] = 1
+                # dummyLabel[6] = 1
+                dummyLabel[0] = 1
             if ("rock" in gen):
-                dummyLabel[8] = 1
+                # dummyLabel[8] = 1
+                # dummyLabel[7] = 1
+                dummyLabel[6] = 1
             if (("country" in gen) or ("southern" in gen)):
-                dummyLabel[9] = 1
+                # dummyLabel[9] = 1
+                # dummyLabel[8] = 1
+                dummyLabel[7] = 1
         
         if (1 not in dummyLabel):
             del analysis[rowL]
@@ -205,10 +223,14 @@ if (token):
     
     print "all good, both are ", len(analysis)
 
-    input_features = np.zeros([len(analysis), 10])
-    
 
+#HERE
+    input_features = np.zeros([len(analysis), 10])
+    # input_features = np.zeros([len(analysis), 9])
+    
+#HERE
     keys = ['energy', 'liveness', 'tempo', 'speechiness', 'acousticness', 'instrumentalness', 'danceability', 'loudness', 'valence', 'mode']
+    # keys = ['energy', 'liveness', 'tempo', 'speechiness', 'acousticness', 'danceability', 'loudness', 'valence']
     values = {}
     min_values = {}
     max_values = {}
@@ -232,21 +254,20 @@ if (token):
                 # double check this
                 del genres[rowI]
                 labels = np.delete(labels, rowI, 0)
-                break                
+                break
             v = normalize(analyzed[key], min_values[key], max_values[key])
             feature_list.append(v)
-        # feature_list = [normalize(analyzed['energy'], analyzed['liveness'], analyzed['tempo'], 
-        #                 analyzed['speechiness'], analyzed['acousticness'], 
-        #                 analyzed['instrumentalness'], analyzed['danceability'],
-        #                 abs(analyzed['loudness']), analyzed['valence']]
+
+#HERE
         if len(feature_list)==10:
+        # if len(feature_list)==9:
             input_features[rowI] = feature_list
             rowI += 1
-    print rowI
+    # print rowI
     while rowI<(input_features.shape)[0]:
         input_features = np.delete(input_features, rowI, 0)
 
-    print "input = ", input_features
+    # print "input = ", input_features
     #print "labels = ", labels
     #print "genres =", genres
     print len(labels)
@@ -255,18 +276,24 @@ if (token):
 
     # call NN with input_features
     learning_rate = 0.3
-    structure = {'num_inputs': 10, 'num_hidden': 30, 'num_outputs': 10}
+
+#HERE
+    # structure = {'num_inputs': 10, 'num_hidden': 30, 'num_outputs': 10}
+    structure = {'num_inputs': 10, 'num_hidden': 30, 'num_outputs': 8}
     candidate = NeuralNet(structure, learning_rate)
 
     #iterations = 15000
-    iterations = 100
+    iterations = 200
 
     candidate.train(input_features, labels, iterations)
 
     cand_error = candidate.test(input_features, labels)
-    print "Train fraction: ", cand_error
+    print "Train error: ", cand_error
           
 else:
     print("Can't get token for", username)
+
+    
+
 
     

@@ -119,6 +119,9 @@ class NeuralNet:
             #label[Y[j]] = float(1)
             self.back_propagate(Y[j])
 
+        err = self.test(X, Y)
+        print "Epoch ", i, " Error = ", err
+
   def test(self, X, Y):
     """
     Tests the NN on observations X with labels Y.
