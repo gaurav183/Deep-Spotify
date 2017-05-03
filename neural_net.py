@@ -152,21 +152,20 @@ class NeuralNet:
 
     wrong = float(0)
     for i in xrange((X.shape)[0]):
-        self.forward_propagate(X[i], 0)
+        self.forward_propagate(X[i])
         #prob = np.argmax(self.predicted[0])
         num_ones = (Y[i]==1).sum()
-        num_ones = 1
+        #num_ones = 1
         temp = (self.predicted[0]).argsort()[-num_ones:][::-1]
         indices = [i for i, x in enumerate(Y[i]) if x==1]
         #print "temp", temp
         #print "indices", indices
         #print "predicted", self.predicted
-        for i in xrange(num_ones):
-            if temp[i] not in indices:
-                #print self.predicted
-                #print "indices", indices
-                wrong+=1
-                break
+        if temp[0] not in indices:
+            wrong+=1
+            if num_ones>1:
+                if temp[1] in indices and self.predicted[0][temp[1]]>0.4:
+                    wrong -=1
         # correct = False
         # for i in xrange(num_ones):
         #     if temp[i] in indices:
