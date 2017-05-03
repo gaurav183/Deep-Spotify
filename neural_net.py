@@ -32,6 +32,9 @@ class NeuralNet:
 
     self.w2 = (np.random.rand(self.num_hidden, self.num_outputs) - 0.5)/10.0
 
+    self.minErr = 1.0
+    self.minW1 = self.w1
+    self.minW2 = self.w2
 
 
   def apply_sigmoid(self, x):
@@ -47,7 +50,7 @@ class NeuralNet:
 
     return (self.w1, self.w2)
 
-  def forward_propagate(self, x):
+  def forward_propagate(self, x, best):
     """
     Push the input 'x' through the network and returns the activations
     on the output nodes.
@@ -60,10 +63,14 @@ class NeuralNet:
     method followed by back_propagate in your train method.
     """
 
+    if (best):
+        (w1, w2) = (self.minW1, self.minW2)
+    else:
+        (w1, w2) = (self.w1, self.w2)
+
     # add 1 for "bias"
     x = np.append(x, [1])
     self.x = x
-    (w1, w2) = (self.w1, self.w2)
     product = np.dot([x], w1)
     for i in xrange(self.num_hidden):
         product[0][i] = self.apply_sigmoid(product[0][i])
@@ -112,15 +119,24 @@ class NeuralNet:
         of the observations.
     - iterations is how many passes over X should be completed.
     """
+    w1Save = "saved_w1"
+    w2Save = "saved_w2"
     for i in xrange(iterations):
         for j in xrange((X.shape)[0]):
-            self.forward_propagate(X[j])
+            self.forward_propagate(X[j], 0)
             #label = np.zeros(shape=(12,), dtype=np.float32)
             #label[Y[j]] = float(1)
             self.back_propagate(Y[j])
 
         err = self.test(X, Y)
-        print "Epoch ", i, " Error = ", err
+        if (err <= self.minErr):
+            self.minErr = err
+            self.minW1 = self.w1
+            self.minW2 = self.w2
+            print "Epoch ", i, " Error = ", err
+
+    np.save(w1Save, self.minW1)
+    np.save(w2Save, self.minW2)
 
   def test(self, X, Y):
     """
@@ -136,7 +152,7 @@ class NeuralNet:
 
     wrong = float(0)
     for i in xrange((X.shape)[0]):
-        self.forward_propagate(X[i])
+        self.forward_propagate(X[i], 0)
         #prob = np.argmax(self.predicted[0])
         num_ones = (Y[i]==1).sum()
         num_ones = 1

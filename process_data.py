@@ -183,31 +183,31 @@ if (token):
             # if (("edm" in gen) or ("electro" in gen)):
             #     dummyLabel[2] = 1
             if (("rap" in gen) or ("trap" in gen) or ("hip hop" in gen)):
-                # dummyLabel[1] = 1
-                dummyLabel[0] = 1
-            if (("metal" in gen) or ("grunge" in gen) or ("emo" in gen)):
-                # dummyLabel[2] = 1
                 dummyLabel[1] = 1
-            if (("indie" in gen) or ("folk" in gen) or ("alternative" in gen)):
-                # dummyLabel[3] = 1
+                # dummyLabel[0] = 1
+            if (("metal" in gen) or ("grunge" in gen) or ("emo" in gen)):
                 dummyLabel[2] = 1
-            if (("classical" in gen) or ("romantic" in gen)):
-                # dummyLabel[4] = 1
+                # dummyLabel[1] = 1
+            if (("indie" in gen) or ("folk" in gen) or ("alternative" in gen)):
                 dummyLabel[3] = 1
-            if (("jazz" in gen) or ("blues" in gen) or ("soul" in gen)):
-                # dummyLabel[5] = 1
+                # dummyLabel[2] = 1
+            if (("classical" in gen) or ("romantic" in gen)):
                 dummyLabel[4] = 1
-            if (("r&b" in gen)):
-                # dummyLabel[6] = 1
+                # dummyLabel[3] = 1
+            if (("jazz" in gen) or ("blues" in gen) or ("soul" in gen)):
                 dummyLabel[5] = 1
+                # dummyLabel[4] = 1
+            if (("r&b" in gen)):
+                dummyLabel[6] = 1
+                # dummyLabel[5] = 1
             if (("dance" in gen) or ("punk" in gen)):
                 # dummyLabel[7] = 1
                 # dummyLabel[6] = 1
                 dummyLabel[0] = 1
             if ("rock" in gen):
                 # dummyLabel[8] = 1
-                # dummyLabel[7] = 1
-                dummyLabel[6] = 1
+                dummyLabel[2] = 1
+                # dummyLabel[6] = 1
             if (("country" in gen) or ("southern" in gen)):
                 # dummyLabel[9] = 1
                 # dummyLabel[8] = 1
@@ -289,6 +289,43 @@ if (token):
 
     cand_error = candidate.test(input_features, labels)
     print "Train error: ", cand_error
+
+    # humble (kendrick), enter sandman (metallica), moonlight sonata (beethoven), beautiful day (U2)
+    testTracks = ["7KXjTSCq5nL1LoYtL7XAwS", "1hKdDCpiI9mqz1jVHRKG0E", "3DNRdudZ2SstnDCVKFdXxG", "1VuBmEauSZywQVtqbxNqka"]
+    testAnalysis = sp.audio_features(tracks=testTracks)
+    testVals = {}
+    testMin = {}
+    testMax = {}
+    testInput = np.zeros([len(testTracks), 10])
+
+    for analyzed in testAnalysis:
+        for key in keys:
+            if analyzed[key]!=None:
+                if key not in testVals:
+                    testVals[key] = []
+                testVals[key].append(analyzed[key])
+    for key in testVals:
+        testMin[key] = min(testVals[key])
+        testMax[key] = max(testVals[key])
+
+    count = 0
+    for analyzed in testAnalysis:
+        testFeature = []
+        for key in keys:
+            if (key!='mode'):
+                v = normalize(analyzed[key], testMin[key], testMax[key])
+            else:
+                v = analyzed[key]
+
+            testFeature.append(v)
+
+        testInput[count] = testFeature
+        count += 1
+
+    for i in xrange(len(testTracks)):
+        output = candidate.forward_propagate(testInput[i], 1)
+
+        print testTracks[i], " ----> ", output
           
 else:
     print("Can't get token for", username)
