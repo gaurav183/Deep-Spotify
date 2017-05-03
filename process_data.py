@@ -285,13 +285,22 @@ if (token):
     #iterations = 15000
     iterations = 200
 
-    candidate.train(input_features, labels, iterations)
+    #candidate.train(input_features, labels, iterations)
 
-    cand_error = candidate.test(input_features, labels)
-    print "Train error: ", cand_error
+    #cand_error = candidate.test(input_features, labels)
+    #print "Train error: ", cand_error
 
-    # humble (kendrick), enter sandman (metallica), moonlight sonata (beethoven), beautiful day (U2)
-    testTracks = ["7KXjTSCq5nL1LoYtL7XAwS", "1hKdDCpiI9mqz1jVHRKG0E", "3DNRdudZ2SstnDCVKFdXxG", "1VuBmEauSZywQVtqbxNqka"]
+    # sorry (bieber), closer, shape of you
+    popTestTracks = ["09CtPGIpYB4BrO8qb1RGsF", "7BKLCZ1jbUBVqRi2FVlTVw", "0FE9t6xYkqWXU2ahLh6D8X"]
+    # moonlight sonata, clair de lune, canon in D
+    classicalTestTracks  = ["3DNRdudZ2SstnDCVKFdXxG", "4H4KkHfXJs3cQEnbNW3bVS", "6A6vSsLkXoTJZ8cA4vtznl"]
+    # HUMBLE, fake love, mask off
+    rapTestTracks = ["7KXjTSCq5nL1LoYtL7XAwS", "343YBumqHu19cGoGARUTsd", "3rOSwuTsUlJp0Pu0MkN8r8"]
+    # enter sandman, man in the box, iron man (might show rock)
+    metalTestTracks = ["1hKdDCpiI9mqz1jVHRKG0E", "6gZVQvQZOFpzIy3HblJ20F","3IOQZRcEkplCXg6LofKqE9"]
+    # beautiful day, smells like teen spirit (might show metal)
+    rockTestTracks = ["1VuBmEauSZywQVtqbxNqka", "5ghIJDpPoe3CfHMGu71E6T"]
+    testTracks = popTestTracks + classicalTestTracks + rapTestTracks + metalTestTracks + rockTestTracks
     testAnalysis = sp.audio_features(tracks=testTracks)
     testVals = {}
     testMin = {}
@@ -324,8 +333,13 @@ if (token):
 
     for i in xrange(len(testTracks)):
         output = candidate.forward_propagate(testInput[i], 1)
-
-        print testTracks[i], " ----> ", output
+        temp = [j[0] for j in sorted(enumerate(output), key=lambda x:x[1])]
+        temp.reverse()
+        if output[temp[1]]>0.5:
+            print temp[0], temp[1]
+        else:
+            print temp[0]
+        print testTracks[i]
           
 else:
     print("Can't get token for", username)
