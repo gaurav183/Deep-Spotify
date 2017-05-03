@@ -33,8 +33,8 @@ class NeuralNet:
     self.w2 = (np.random.rand(self.num_hidden, self.num_outputs) - 0.5)/10.0
 
     self.minErr = 1.0
-    self.minW1 = self.w1
-    self.minW2 = self.w2
+    self.minW1 = np.load("saved_w1.npy")
+    self.minW2 = np.load("saved_w2.npy")
 
 
   def apply_sigmoid(self, x):
