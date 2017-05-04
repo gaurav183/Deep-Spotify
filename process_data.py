@@ -245,6 +245,9 @@ if (token):
         max_values[key] = max(values[key])
 
 
+    np.save('min_vals.npy', min_values)
+    np.save('max_vals.npy', max_values)
+
     rowI = 0
     print len(analysis)
     for analyzed in analysis:
@@ -302,27 +305,15 @@ if (token):
     rockTestTracks = ["1VuBmEauSZywQVtqbxNqka", "5ghIJDpPoe3CfHMGu71E6T"]
     testTracks = popTestTracks + classicalTestTracks + rapTestTracks + metalTestTracks + rockTestTracks
     testAnalysis = sp.audio_features(tracks=testTracks)
-    testVals = {}
-    testMin = {}
-    testMax = {}
+    
     testInput = np.zeros([len(testTracks), 10])
-
-    for analyzed in testAnalysis:
-        for key in keys:
-            if analyzed[key]!=None:
-                if key not in testVals:
-                    testVals[key] = []
-                testVals[key].append(analyzed[key])
-    for key in testVals:
-        testMin[key] = min(testVals[key])
-        testMax[key] = max(testVals[key])
 
     count = 0
     for analyzed in testAnalysis:
         testFeature = []
         for key in keys:
             if (key!='mode'):
-                v = normalize(analyzed[key], testMin[key], testMax[key])
+                v = normalize(analyzed[key], min_values[key], max_values[key])
             else:
                 v = analyzed[key]
 

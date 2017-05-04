@@ -28,29 +28,20 @@ def predict(query):
 
     keys = ['energy', 'liveness', 'tempo', 'speechiness', 'acousticness', 'instrumentalness', 'danceability', 'loudness', 'valence', 'mode']
 
+    min_vals = np.load('min_vals.npy').item()
+    max_vals = np.load('max_vals.npy').item()
+
     testTracks = [searchRes]
     testAnalysis = sp.audio_features(tracks=testTracks)
-    testVals = {}
-    testMin = {}
-    testMax = {}
-    testInput = np.zeros([len(testTracks), 10])
 
-    for analyzed in testAnalysis:
-        for key in keys:
-            if analyzed[key]!=None:
-                if key not in testVals:
-                    testVals[key] = []
-                testVals[key].append(analyzed[key])
-    for key in testVals:
-        testMin[key] = min(testVals[key])
-        testMax[key] = max(testVals[key])
+    testInput = np.zeros([len(testTracks), 10])
 
     count = 0
     for analyzed in testAnalysis:
         testFeature = []
         for key in keys:
-            if (key=='mode'):
-                v = normalize(analyzed[key], testMin[key], testMax[key])
+            if (key!='mode'):
+                v = normalize(analyzed[key], min_vals[key], max_vals[key])
             else:
                 v = analyzed[key]
 
