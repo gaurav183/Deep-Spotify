@@ -288,7 +288,7 @@ if (token):
     #iterations = 15000
     iterations = 200
 
-    #candidate.train(input_features, labels, iterations)
+    candidate.train(input_features, labels, iterations)
 
     #cand_error = candidate.test(input_features, labels)
     #print "Train error: ", cand_error

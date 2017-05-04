@@ -50,7 +50,7 @@ class NeuralNet:
 
     return (self.w1, self.w2)
 
-  def forward_propagate(self, x, best):
+  def forward_propagate(self, x, best=0):
     """
     Push the input 'x' through the network and returns the activations
     on the output nodes.

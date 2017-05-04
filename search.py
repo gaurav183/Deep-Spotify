@@ -27,7 +27,7 @@ class Search:
         #token = util.prompt_for_user_token(username)
         # change this back 
         # token = "BQDgUh4f6qHjBHmuoRRSt07S7Z_98wtK8ImZkmBvcSWj5ItAdpus3xRu1udx7jPhuG2GemnYtUBnb2xJNoS7QEG2jrGknc815NjOI6rmfcDNxf-6LpiceI78MrnydEhWAc5vd8fx7bI"
-        token = "BQCd-6POSEk-Rgp2tvpiW-VldlDFbfdkz9wWUqzTa1KDflMpgr-Jddd1idA6j_Ephy7zUghE6nTQ220xd9lETptrPoXrII_UMsBxasNRPabcRj83dZ93RDxI9xvKTqPrnkZjrdmbnFM"
+        token = "BQBUVzk5gnZP-AZSZw8okcUtxeYxys5nZQb5MlKFBYov4XXfwtnN-ukLBm4bb-8IAzLiHw9mTZ_VtKGTaMom0a5hATGiqUiYULguQez8Jjkwln94En_RJNOn-btiAoUijmoZ_Evgw_Q"
         sp = spotipy.Spotify(token)
         # check for errors here 
         first = sp.search(query)['tracks']['items'][0]
