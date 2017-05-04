@@ -26,7 +26,8 @@ class Search:
         username = '12180915492'
         #token = util.prompt_for_user_token(username)
         # change this back 
-        token = "BQDgUh4f6qHjBHmuoRRSt07S7Z_98wtK8ImZkmBvcSWj5ItAdpus3xRu1udx7jPhuG2GemnYtUBnb2xJNoS7QEG2jrGknc815NjOI6rmfcDNxf-6LpiceI78MrnydEhWAc5vd8fx7bI"
+        # token = "BQDgUh4f6qHjBHmuoRRSt07S7Z_98wtK8ImZkmBvcSWj5ItAdpus3xRu1udx7jPhuG2GemnYtUBnb2xJNoS7QEG2jrGknc815NjOI6rmfcDNxf-6LpiceI78MrnydEhWAc5vd8fx7bI"
+        token = "BQCkPRi9xOs4YiTyojkzmPyzFiLXORJebhGWUwt4OwnNRadd3Q8evV9B0fUiBKQDM7Ya3irOip_dShwfHuoHqcb8Fsv1Hf1ctdKNyRA-ClSpfsa6aGMj3ixx5OCn3iZVg6Ch2F3Vhi5q5tmS"
         sp = spotipy.Spotify(token)
         # check for errors here 
         searchRes = sp.search(query)['tracks']['items'][0]['uri']
@@ -73,7 +74,13 @@ class Search:
             temp = [j[0] for j in sorted(enumerate(output), key=lambda x:x[1])]
             temp.reverse()
             if output[temp[1]]>0.5:
-                result = [self.genre_map[temp[0]], self.genre_map[temp[1]]]
+                if (temp[0] == 0):
+                    if (output[0] > 0.99):
+                        result = [self.genre_map[temp[0]], self.genre_map[temp[1]]]
+                    else:
+                        result = [self.genre_map[temp[1]]]#[self.genre_map[temp[0]], self.genre_map[temp[1]]]
+                else:
+                    result = [self.genre_map[temp[0]], self.genre_map[temp[1]]]
             else:
                 result = [self.genre_map[temp[0]]]
         return result
