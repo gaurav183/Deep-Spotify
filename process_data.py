@@ -303,12 +303,16 @@ if (token):
     metalTestTracks = ["1hKdDCpiI9mqz1jVHRKG0E", "6gZVQvQZOFpzIy3HblJ20F","3IOQZRcEkplCXg6LofKqE9"]
     # beautiful day, smells like teen spirit (might show metal)
     rockTestTracks = ["1VuBmEauSZywQVtqbxNqka", "5ghIJDpPoe3CfHMGu71E6T"]
-    testTracks = popTestTracks + classicalTestTracks + rapTestTracks + metalTestTracks + rockTestTracks
+
+    jazzTestTracks = ["4Vqa8U8soMx9yT2HtoWXUY", "1AwBPJOJuyAxIBKyhg153s", "5p6me2mwQrGfH30eExHn6v"]
+
+    testTracks = popTestTracks + classicalTestTracks + rapTestTracks + metalTestTracks + rockTestTracks + jazzTestTracks
     testAnalysis = sp.audio_features(tracks=testTracks)
     
     testInput = np.zeros([len(testTracks), 10])
 
     count = 0
+    # why isnt there a None
     for analyzed in testAnalysis:
         testFeature = []
         for key in keys:
