@@ -19,18 +19,19 @@ def main():
 def search():
 	print(request.form['song'], file=sys.stderr)
 	search = Search(request.form['song'])
-	genres = search.run()
-	# make sure 
-	print(genres, file=sys.stderr)
-	genre1 = genres[0]
+	result = search.run()
+	genres = result[0]
+	(song, artist) = result[1]
+	suggestions = result[2]
+	genre1 = genres[0].upper()
 	if (len(genres)==2):
-		genre2 = genres[1]
+		genre2 = genres[1].upper()
 	else: 
 		genre2 = ''
 	print(genres, file=sys.stderr)
 	
 
-   	return render_template('result.html', genre1=genre1, genre2=genre2)
+   	return render_template('result.html', genre1=genre1, genre2=genre2, song=song, artist=artist, suggestions=suggestions)
 
 if __name__ == "__main__":
   app.run()

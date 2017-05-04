@@ -7,7 +7,7 @@ from neural_net import NeuralNet
 
 class Search:
     def __init__(self, query):
-        self.genre_map = ["pop", "hip hop", "metal/rock", "indie", "classical", "jazz", "r&b", "country"]
+        self.genre_map = ["pop", "hip-hop", "metal/rock", "indie/alternative", "classical", "jazz", "r-n-b", "country"]
         self.query = query
 
     def run(self):
@@ -27,10 +27,14 @@ class Search:
         #token = util.prompt_for_user_token(username)
         # change this back 
         # token = "BQDgUh4f6qHjBHmuoRRSt07S7Z_98wtK8ImZkmBvcSWj5ItAdpus3xRu1udx7jPhuG2GemnYtUBnb2xJNoS7QEG2jrGknc815NjOI6rmfcDNxf-6LpiceI78MrnydEhWAc5vd8fx7bI"
-        token = "BQCkPRi9xOs4YiTyojkzmPyzFiLXORJebhGWUwt4OwnNRadd3Q8evV9B0fUiBKQDM7Ya3irOip_dShwfHuoHqcb8Fsv1Hf1ctdKNyRA-ClSpfsa6aGMj3ixx5OCn3iZVg6Ch2F3Vhi5q5tmS"
+        token = "BQCd-6POSEk-Rgp2tvpiW-VldlDFbfdkz9wWUqzTa1KDflMpgr-Jddd1idA6j_Ephy7zUghE6nTQ220xd9lETptrPoXrII_UMsBxasNRPabcRj83dZ93RDxI9xvKTqPrnkZjrdmbnFM"
         sp = spotipy.Spotify(token)
         # check for errors here 
-        searchRes = sp.search(query)['tracks']['items'][0]['uri']
+        first = sp.search(query)['tracks']['items'][0]
+        artist_name = first['artists'][0]['name']
+        artist_id = first['artists'][0]['id']
+        song_name = first['name']
+        searchRes = first['uri']
 
         # call NN with input_features
 
@@ -83,8 +87,25 @@ class Search:
                     result = [self.genre_map[temp[0]], self.genre_map[temp[1]]]
             else:
                 result = [self.genre_map[temp[0]]]
-        return result
 
+        seed_genres = []
+        for genre in result:
+            if "metal" in genre:
+                seed_genres.append("heavy-metal")
+                seed_genres.append("rock")
+            elif "indie" in genre:
+                seed_genres.append("indie")
+                seed_genres.append("alternative")
+            else:
+                seed_genres.append(genre)
+
+        recommendations = sp.recommendations(seed_genres=seed_genres, seed_artists=[artist_id])
+        suggestions = []
+        for track in (recommendations['tracks'])[:5]:
+            suggestion = {'name':track['name'], 'artist':track['artists'][0]['name']}
+            suggestions.append(suggestion)
+
+        return [result, (song_name, artist_name), suggestions]
         # except:
             # print "try again"
 
