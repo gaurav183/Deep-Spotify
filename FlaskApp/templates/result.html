@@ -59,9 +59,18 @@
     </nav>
 
     <!-- Header -->
-    <header id="top" class="header">
+    <header id="top" class ="result-bg">
         <div class="text-vertical-center">
+            <h2>Predicting genres for {{song}} by {{artist}}...</h2>
             <h1>{{genre1}}</h1><h1>{{genre2}}</h1>
+            <br>
+            <h3>Here are some suggested songs:</h3>
+            <ul>
+                {% for suggestion in suggestions %}
+                <li> <h2> {{ suggestion.name }} by {{ suggestion.artist }} </h2> 
+                </li>
+                {% endfor %}
+            </ul>
         </div>
     </header>
 
