@@ -42,4 +42,13 @@ Numpy array that stores weights of nodes from input layer to hidden layer
 
 search.py
 
+Takes query and uses neural network to output genre predictions and track recommendations
+
+song_ids.txt
+
+Contains dataset of one million songs
+
+spotify_ids.txt
+
+Contains dataset of songs from featured playlists on spotify
 Stores top 200 songs
