@@ -109,7 +109,7 @@ class NeuralNet:
     self.w1 = np.add(w1, deriv_w1)
 
 
-  def train(self, X, Y, iterations=100):
+  def train(self, X, Y, X1, Y1, iterations=100):
     """
     Trains the NN on observations X with labels Y.
 
@@ -121,6 +121,8 @@ class NeuralNet:
     """
     w1Save = "saved_w1"
     w2Save = "saved_w2"
+    errMat1 = []
+    errMat2 = []
     for i in xrange(iterations):
         for j in xrange((X.shape)[0]):
             self.forward_propagate(X[j], 0)
@@ -128,17 +130,29 @@ class NeuralNet:
             #label[Y[j]] = float(1)
             self.back_propagate(Y[j])
 
-        err = self.test(X, Y)
+        err = self.test(X, Y, 0)
         if (err <= self.minErr):
             self.minErr = err
             self.minW1 = self.w1
             self.minW2 = self.w2
-            print "Epoch ", i, " Error = ", err
+
+        errMat1.append(err)
+        err2 = self.test(X1, Y1, 0)
+        errMat2.append(err2)
+
+
+    print "TRAIN"
+    for num in errMat1:
+        print num
+
+    print "TEST"
+    for num in errMat2:
+        print num
 
     np.save(w1Save, self.minW1)
     np.save(w2Save, self.minW2)
 
-  def test(self, X, Y):
+  def test(self, X, Y, best):
     """
     Tests the NN on observations X with labels Y.
 
@@ -152,7 +166,7 @@ class NeuralNet:
 
     wrong = float(0)
     for i in xrange((X.shape)[0]):
-        self.forward_propagate(X[i])
+        self.forward_propagate(X[i], best)
         #prob = np.argmax(self.predicted[0])
         num_ones = (Y[i]==1).sum()
         #num_ones = 1
