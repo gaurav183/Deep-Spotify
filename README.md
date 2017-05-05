@@ -8,47 +8,25 @@ follow steps to authenticate your Spotify account
 
 input any song and watch it predict the genre!
 
-create_spotify_file.py
+create_spotify_file.py-Stores track_ids using Spotipy
 
-Stores track_ids using Spotipy
+genres.txt-Uses .txt file to store genres that categorize songs
 
-genres.txt
+max_vals.npy-Dictionary that stores max values of each acoustic feature when they are all normalized
 
-Uses .txt file to store genres that categorize songs
+min_vals.npy-Dictionary that stores min values of each acoustic feature when they are all normalized
 
-max_vals.npy
+neural_net.py-Contains neural network used to categorize each song in genre(s)
 
-Dictionary that stores max values of each acoustic feature when they are all normalized
+process_data.py-Get track_ids from songs using Spotipy, creates labels, normalizes acoustic features found using Spotipy, passes data through neural network
 
-min_vals.npy
+saved_w1.npy-Numpy array that stores weights of nodes from input layer to hidden layer
 
-Dictionary that stores min values of each acoustic feature when they are all normalized
+saved_w2.npy-Numpy array that stores weights of nodes from input layer to hidden layer
 
-neural_net.py
+search.py-Takes query and uses neural network to output genre predictions and track recommendations
 
-Contains neural network used to categorize each song in genre(s)
+song_ids.txt-Contains dataset of one million songs
 
-process_data.py
+spotify_ids.txt-Contains dataset of songs from featured playlists on spotify
 
-Get track_ids from songs using Spotipy, creates labels, normalizes acoustic features found using Spotipy, passes data through neural network
-
-saved_w1.npy
-
-Numpy array that stores weights of nodes from input layer to hidden layer
-
-saved_w2.npy
-
-Numpy array that stores weights of nodes from input layer to hidden layer
-
-search.py
-
-Takes query and uses neural network to output genre predictions and track recommendations
-
-song_ids.txt
-
-Contains dataset of one million songs
-
-spotify_ids.txt
-
-Contains dataset of songs from featured playlists on spotify
-Stores top 200 songs
