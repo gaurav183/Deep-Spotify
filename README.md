@@ -26,8 +26,20 @@ Dictionary that stores min values of each acoustic feature when they are all nor
 
 neural_net.py
 
-Neural network used to categorize each song in a genre
+Contains neural network used to categorize each song in genre(s)
 
 process_data.py
 
 Get track_ids from songs using Spotipy, creates labels, normalizes acoustic features found using Spotipy, passes data through neural network
+
+saved_w1.npy
+
+Numpy array that stores weights of nodes from input layer to hidden layer
+
+saved_w2.npy
+
+Numpy array that stores weights of nodes from input layer to hidden layer
+
+search.py
+
+Stores top 200 songs
